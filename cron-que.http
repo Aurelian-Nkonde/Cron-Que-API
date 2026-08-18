@@ -1,0 +1,6 @@
+@cron_que_HostAddress = http://localhost:5023
+
+GET {{cron_que_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
