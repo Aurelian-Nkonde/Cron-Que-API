@@ -47,6 +47,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendDev", policy =>
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 builder.Services.AddHangfire(config =>
     config.UsePostgreSqlStorage(c =>
         c.UseNpgsqlConnection(connectionString)));
@@ -63,6 +71,11 @@ var queueOptions = new BackgroundJobServerOptions
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 
 
@@ -76,6 +89,8 @@ app.UseHangfireServer(queueOptions);
 app.UseHangfireDashboard();
 
 app.UseHttpsRedirection();
+
+app.UseCors("FrontendDev");
 
 app.UseAuthentication();
 app.UseAuthorization();

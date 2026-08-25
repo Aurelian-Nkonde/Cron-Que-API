@@ -29,6 +29,7 @@ public class ItemsService
             Name = dto.Name,
             Description = dto.Description,
             UserId = dto.UserId,
+            ImageUrl = dto.ImageUrl,
             CreatedAt = createdAt,
             ExpiresAt = createdAt.AddMinutes(times.ToMinutes()),
         };
@@ -46,7 +47,7 @@ public class ItemsService
     public async Task<List<ItemDto>> GetAllItemsAsync()
     {
         return await db.Items
-            .Select(i => new ItemDto(i.Id, i.Name, i.Description, i.UserId, i.Status, i.CreatedAt, i.ExpiresAt))
+            .Select(i => new ItemDto(i.Id, i.Name, i.ImageUrl, i.Description, i.UserId, i.Status, i.CreatedAt, i.ExpiresAt))
             .AsNoTracking().ToListAsync();
     }
 
@@ -79,6 +80,7 @@ public class ItemsService
         var result = new ItemDto(
             Id: item.Id,
             UserId: item.UserId,
+            ImageUrl: item.ImageUrl,
             Name: item.Name,
             Status: item.Status,
             Description: item.Description,
@@ -92,6 +94,6 @@ public class ItemsService
 
 
     private static ItemDto ToDto(Item item) =>
-        new(item.Id, item.Name, item.Description, item.UserId, item.Status, item.CreatedAt, item.ExpiresAt);
+        new(item.Id, item.Name, item.ImageUrl, item.Description, item.UserId, item.Status, item.CreatedAt, item.ExpiresAt);
 
 }

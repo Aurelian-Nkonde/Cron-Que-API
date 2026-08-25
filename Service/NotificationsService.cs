@@ -20,7 +20,7 @@ public class NotificationsService
     public async Task<List<NotificationDto>> GetAllNotificationsAsync()
     {
         return await db.Notifications
-            .Select(n => new NotificationDto(n.Id, n.UserId, n.Message, n.CreatedAt))
+            .Select(n => new NotificationDto(n.Id, n.UserId, n.Message, n.CreatedAt, n.IsRead))
             .AsNoTracking()
             .ToListAsync();
     }
@@ -39,7 +39,21 @@ public class NotificationsService
         db.Notifications.Add(notification);
         await db.SaveChangesAsync();
 
-        return new NotificationDto(notification.Id, notification.UserId, notification.Message, notification.CreatedAt);
+        return new NotificationDto(notification.Id, notification.UserId, notification.Message, notification.CreatedAt, notification.IsRead);
+    }
+
+    public async Task<NotificationDto?> MarkNotificationAsReadAsync(Guid id)
+    {
+        var notification = await db.Notifications.FindAsync(id);
+        if (notification is null)
+        {
+            return null;
+        }
+
+        notification.IsRead = true;
+        await db.SaveChangesAsync();
+
+        return new NotificationDto(notification.Id, notification.UserId, notification.Message, notification.CreatedAt, notification.IsRead);
     }
 
 

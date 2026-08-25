@@ -29,4 +29,11 @@ public class NotificationsController : ControllerBase
         var notification = await notificationsService.CreateNotificationAsync(dto);
         return CreatedAtAction(nameof(GetAllNotifications), new { }, notification);
     }
+
+    [HttpPatch("read")]
+    public async Task<IActionResult> MarkAsRead([FromQuery] Guid id)
+    {
+        var notification = await notificationsService.MarkNotificationAsReadAsync(id);
+        return notification is null ? NotFound() : Ok(notification);
+    }
 }
