@@ -56,6 +56,28 @@ dotnet run
 - Hangfire dashboard (queues, scheduled/recurring/failed jobs):
   `http://localhost:5023/hangfire`
 
+## Running everything with Docker
+
+The API, Postgres, and the [Next.js frontend](https://github.com/Aurelian-Nkonde/Cron-Que-Web)
+run together via `docker-compose.yml` in this repo. It expects the
+frontend repo to be checked out as a **sibling folder** named
+`cron-que-ui`:
+
+```bash
+git clone https://github.com/Aurelian-Nkonde/Cron-Que-API.git cron-que
+git clone https://github.com/Aurelian-Nkonde/Cron-Que-Web.git cron-que-ui
+
+cd cron-que
+docker compose up --build
+```
+
+- Frontend: `http://localhost:3000`
+- API: `http://localhost:8080` (interactive docs at `/scalar/v1`, Hangfire dashboard at `/hangfire`)
+- Postgres: `localhost:5433` (mapped to a different host port than `5432` to avoid clashing with a locally-installed Postgres)
+
+Migrations are applied automatically on API startup — no manual
+`dotnet ef database update` step needed for the Docker path.
+
 ## Auth flow
 
 ```bash

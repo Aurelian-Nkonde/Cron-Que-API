@@ -11,3 +11,4 @@ appsettings.*.local.json
 .git
 Dockerfile
 .dockerignore
+docker-compose.yml
