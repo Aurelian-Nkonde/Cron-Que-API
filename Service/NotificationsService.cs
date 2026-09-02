@@ -1,7 +1,9 @@
 using cron_que.Data;
 using cron_que.Dtos;
+using cron_que.hubs;
 using cron_que.Models;
 using Hangfire;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace cron_que.Service;
@@ -10,11 +12,12 @@ public class NotificationsService
 {
     private readonly AppDbContext db;
     private readonly LikesService _likesService;
-
-    public NotificationsService(AppDbContext db, LikesService likesService)
+    private readonly IHubContext<NotificationHub> _notificationHub;
+    public NotificationsService(AppDbContext db, LikesService likesService, IHubContext<NotificationHub> notificationHub)
     {
         this.db = db;
         _likesService = likesService;
+        _notificationHub = notificationHub;
     }
 
     public async Task<List<NotificationDto>> GetAllNotificationsAsync()
@@ -38,7 +41,11 @@ public class NotificationsService
 
         db.Notifications.Add(notification);
         await db.SaveChangesAsync();
-
+        await _notificationHub.Clients.User(notification.UserId.ToString()!).SendAsync("ReceiveNotification", new
+        {
+            message = notification.Message,
+            createdAt = notification.CreatedAt.ToString()
+        });
         return new NotificationDto(notification.Id, notification.UserId, notification.Message, notification.CreatedAt, notification.IsRead);
     }
 

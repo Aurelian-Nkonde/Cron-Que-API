@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using cron_que.Data;
+using cron_que.hubs;
 using cron_que.Service;
 using Hangfire;
 using Hangfire.PostgreSql;
@@ -17,6 +18,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -52,7 +54,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("FrontendDev", policy =>
         policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
-              .AllowAnyMethod());
+              .AllowAnyMethod()
+              .AllowCredentials());
+              
 });
 
 builder.Services.AddHangfire(config =>
@@ -94,6 +98,8 @@ app.UseCors("FrontendDev");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.MapControllers();
 
